@@ -1,0 +1,65 @@
+# =======================================================
+# OmniDownloader Pro - .gitignore
+# =======================================================
+
+# Python & Entornos Virtuales
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+server/venv/
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Variables de Entorno y Secretos
+.env
+.env.local
+.env.*.local
+
+# Binarios locales descargados o temporales
+server/bin/*.exe
+server/bin/*.dll
+server/bin/*.zip
+
+# Descargas y archivos multimedia temporales
+downloads/
+server/downloads/
+server/temp/
+*.mp4
+*.mp3
+*.m4a
+*.webm
+*.mkv
+*.part
+*.ytdl
+
+# Empaquetado de extensiones y JS
+*.crx
+*.pem
+node_modules/
+
+# Worktrees de Git
+.worktrees/
+
+# IDEs y Editores de Código
+.vscode/
+.idea/
+*.swp
+*.swo
+*.sublime-project
+*.sublime-workspace
+
+# Archivos del Sistema Operativo
+Thumbs.db
+desktop.ini
+.DS_Store
+
+# Logs
+*.log

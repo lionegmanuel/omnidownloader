@@ -1,0 +1,137 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>OmniDownloader Pro</title>
+    <link rel="stylesheet" href="popup.css" />
+  </head>
+  <body>
+    <div class="app-container">
+      <!-- Header -->
+      <header class="header">
+        <div class="logo-area">
+          <div class="logo-icon">🚀</div>
+          <div>
+            <h1 class="logo-title">OmniDownloader</h1>
+            <span class="version-tag">PRO v1.0</span>
+          </div>
+        </div>
+        <div
+          id="serverStatus"
+          class="status-pill offline"
+          title="Verificando conexión con el motor local..."
+        >
+          <span class="status-dot"></span>
+          <span id="statusText">Conectando...</span>
+        </div>
+      </header>
+
+      <!-- Alerta Servidor Desconectado -->
+      <div id="serverOfflineAlert" class="alert-box hidden">
+        <div class="alert-icon">⚠️</div>
+        <div class="alert-content">
+          <strong>Motor local inactivo</strong>
+          <p>
+            Inicia el servicio ejecutando <code>start_server.bat</code> en tu
+            PC.
+          </p>
+          <button id="btnRetryServer" class="btn-secondary btn-sm">
+            Reintentar Conexión
+          </button>
+        </div>
+      </div>
+
+      <!-- Pestaña Activa / Video Principal -->
+      <main class="main-content">
+        <section class="card active-video-card">
+          <div class="card-header">
+            <span class="section-badge">Página Actual</span>
+            <span id="platformTag" class="platform-badge">Web</span>
+          </div>
+
+          <div class="video-preview">
+            <div id="videoThumb" class="thumb-container">
+              <div class="thumb-placeholder">🎬</div>
+            </div>
+            <div class="video-info">
+              <h2
+                id="videoTitle"
+                class="video-title"
+                title="Cargando título..."
+              >
+                Detectando video en la pestaña...
+              </h2>
+              <p id="videoDuration" class="video-meta">Duración: --:--</p>
+            </div>
+          </div>
+
+          <div class="download-controls">
+            <div class="control-group">
+              <label for="qualitySelect" class="label"
+                >Calidad de Descarga:</label
+              >
+              <select id="qualitySelect" class="select-input">
+                <option value="best">
+                  💎 Mejor Calidad Disponible (4K / 1080p)
+                </option>
+                <option value="1080p">🎬 1080p Full HD</option>
+                <option value="720p">📱 720p HD</option>
+                <option value="audio_only">🎵 Solo Audio (MP3 320 kbps)</option>
+              </select>
+            </div>
+
+            <button id="btnDownloadCurrent" class="btn-primary">
+              <span class="btn-icon">⬇️</span>
+              <span id="btnDownloadText">Descargar Video</span>
+            </button>
+          </div>
+        </section>
+
+        <!-- Streams Detectados por Sniffer (.m3u8, .mpd, .mp4) -->
+        <section class="card sniffer-card">
+          <div class="accordion-header" id="toggleSniffer">
+            <div class="title-with-badge">
+              <span class="card-subtitle">Streams Interceptados</span>
+              <span id="snifferCountBadge" class="count-badge">0</span>
+            </div>
+            <span id="snifferArrow" class="arrow">▼</span>
+          </div>
+
+          <div id="snifferList" class="sniffer-list">
+            <p id="noStreamsText" class="empty-text">
+              No se han detectado transmisiones HLS o directas en esta página.
+            </p>
+          </div>
+        </section>
+
+        <!-- Descargas en Curso / Recientes -->
+        <section class="card tasks-card">
+          <div class="card-header">
+            <span class="card-subtitle">Descargas Recientes</span>
+            <button
+              id="btnOpenFolder"
+              class="btn-text"
+              title="Abrir carpeta de descargas en el explorador"
+            >
+              📂 Abrir Carpeta
+            </button>
+          </div>
+
+          <div id="tasksList" class="tasks-list">
+            <p id="noTasksText" class="empty-text">
+              No hay descargas activas en este momento.
+            </p>
+          </div>
+        </section>
+      </main>
+
+      <!-- Footer -->
+      <footer class="footer">
+        <span>100% Privado • Sin marcas de agua • Sin límites</span>
+      </footer>
+    </div>
+
+    <script src="popup.js"></script>
+  </body>
+</html>

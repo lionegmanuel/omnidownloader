@@ -14,6 +14,10 @@ document.addEventListener("DOMContentLoaded", async () => {
   await loadCurrentTab();
   await loadSniffedStreams();
   await loadRecentTasks();
+
+  // Refrescar streams sniffeados mientras el popup sigue abierto: en LMS/reproductores
+  // JS el manifest .m3u8 suele pedirse recién al darle Play, después de abrir el popup.
+  setInterval(loadSniffedStreams, 2000);
 });
 
 function initUI() {
@@ -265,20 +269,37 @@ async function handleCurrentDownload() {
     targetUrl.includes("facebook.com") ||
     targetUrl.includes("reddit.com");
 
-  if (
-    !isDedicatedPlatform &&
-    currentSniffedStreams &&
-    currentSniffedStreams.length > 0
-  ) {
-    const hls = currentSniffedStreams.find(
-      (s) => s.type?.includes("HLS") || s.url?.includes(".m3u8"),
-    );
-    const mp4 = currentSniffedStreams.find(
-      (s) => s.type?.includes("MP4") || s.url?.includes(".mp4"),
-    );
-    const chosen = hls || mp4 || currentSniffedStreams[0];
-    if (chosen && chosen.url) {
-      targetUrl = chosen.url;
+  if (!isDedicatedPlatform) {
+    // Refrescar streams sniffeados justo antes de descargar: pueden haberse
+    // detectado recién (ej. al darle Play al video) después de abrir el popup,
+    // así que no confiamos en el snapshot cargado al inicio.
+    const freshStreams = await new Promise((resolve) => {
+      chrome.runtime.sendMessage(
+        { action: "GET_TAB_STREAMS", tabId: currentTab.id },
+        (response) => resolve(response?.streams || []),
+      );
+    });
+    if (freshStreams.length > 0) currentSniffedStreams = freshStreams;
+
+    if (currentSniffedStreams && currentSniffedStreams.length > 0) {
+      const hls = currentSniffedStreams.find(
+        (s) => s.type?.includes("HLS") || s.url?.includes(".m3u8"),
+      );
+      const mp4 = currentSniffedStreams.find(
+        (s) => s.type?.includes("MP4") || s.url?.includes(".mp4"),
+      );
+      const chosen = hls || mp4 || currentSniffedStreams[0];
+      if (chosen && chosen.url) {
+        targetUrl = chosen.url;
+      }
+    } else {
+      // Sin stream detectado y sin extractor dedicado: mandar la URL de la
+      // página a yt-dlp solo fallaría con "Unsupported URL". Avisar en vez de
+      // disparar una descarga condenada al error.
+      alert(
+        "No se detectó ningún stream de video en esta página todavía.\n\nDale Play al video para que el sniffer capture la transmisión real (.m3u8/.mp4) y volvé a intentar la descarga.",
+      );
+      return;
     }
   }
 

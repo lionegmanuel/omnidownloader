@@ -120,15 +120,23 @@ class MediaDownloader:
     ):
         opts = cls._build_ydl_base_opts(headers, cookies)
 
+        # ID corto y estable propio (no confiar en %(id)s de yt-dlp: en streams genéricos
+        # .m3u8/.mpd con query strings largos (tokens JWT, firmas), el extractor genérico usa
+        # la URL completa como id, generando rutas que superan el límite de 260 caracteres de
+        # Windows y provocan "[Errno 2] No such file or directory" al crear el .ytdl temporal).
+        short_id = task_id[:8]
+
         # Plantilla de salida limpia en la carpeta de descargas
         if title and title.strip() and title not in ("Video", "Descarga Multimedia", "Video Web"):
             safe_title = sanitize_filename(title)
-            outtmpl = os.path.join(str(settings.DOWNLOAD_DIR), f"{safe_title} [%(id)s].%(ext)s")
+            outtmpl = os.path.join(str(settings.DOWNLOAD_DIR), f"{safe_title} [{short_id}].%(ext)s")
         else:
-            outtmpl = os.path.join(str(settings.DOWNLOAD_DIR), "%(title).100B [%(id)s].%(ext)s")
+            outtmpl = os.path.join(str(settings.DOWNLOAD_DIR), f"%(title).100B [{short_id}].%(ext)s")
 
         opts['outtmpl'] = outtmpl
         opts['updatetime'] = False
+        opts['windowsfilenames'] = True
+        opts['trim_file_name'] = 150
 
         # Configurar calidad y post-procesadores
         if quality_profile == "audio_only":

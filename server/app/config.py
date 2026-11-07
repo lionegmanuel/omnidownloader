@@ -13,8 +13,12 @@ class Settings:
     DEBUG: bool = os.getenv("DEBUG", "True").lower() in ("true", "1", "yes")
 
     # Directorio de Descargas (Estrictamente en disco D: - D:\Documents\MANUEL\OmniDownloader)
-    DEFAULT_DOWNLOAD_DIR = Path("D:/Documents/MANUEL/OmniDownloader")
+    # En Linux (Fedora) el D: de Windows es /mnt/d (se cambia con VX_RAIZ_D)
+    RAIZ_D = "D:/" if os.name == "nt" else os.getenv("VX_RAIZ_D", "/mnt/d").rstrip("/") + "/"
+    DEFAULT_DOWNLOAD_DIR = Path(RAIZ_D + "Documents/MANUEL/OmniDownloader")
     custom_download_dir = os.getenv("DOWNLOAD_DIR", "").strip()
+    if os.name != "nt" and custom_download_dir[:2].lower() == "d:":
+        custom_download_dir = RAIZ_D + custom_download_dir[2:].replace("\\", "/").lstrip("/")
     if custom_download_dir:
         candidate = Path(os.path.expanduser(custom_download_dir))
     else:
@@ -29,7 +33,7 @@ class Settings:
 
     # Detección de FFmpeg
     custom_ffmpeg = os.getenv("FFMPEG_PATH", "").strip()
-    bin_ffmpeg = Path(__file__).resolve().parent.parent / "bin" / "ffmpeg.exe"
+    bin_ffmpeg = Path(__file__).resolve().parent.parent / "bin" / ("ffmpeg.exe" if os.name == "nt" else "ffmpeg")
 
     if custom_ffmpeg and os.path.exists(custom_ffmpeg):
         FFMPEG_PATH: str = custom_ffmpeg

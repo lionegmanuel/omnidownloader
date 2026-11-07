@@ -8,6 +8,10 @@ let currentTabCookies = "";
 let currentSniffedStreams = [];
 let activePollers = new Map();
 
+// Script que levanta el motor local: start_server.bat en Windows, start_server.sh en Linux y macOS.
+const PLATAFORMA = navigator.userAgentData?.platform || navigator.platform || "";
+const SCRIPT_SERVIDOR = /win/i.test(PLATAFORMA) ? "start_server.bat" : "start_server.sh";
+
 document.addEventListener("DOMContentLoaded", async () => {
   initUI();
   await checkServerHealth();
@@ -21,6 +25,8 @@ document.addEventListener("DOMContentLoaded", async () => {
 });
 
 function initUI() {
+  const scriptServidor = document.getElementById("scriptServidor");
+  if (scriptServidor) scriptServidor.textContent = SCRIPT_SERVIDOR;
   document
     .getElementById("btnRetryServer")
     ?.addEventListener("click", checkServerHealth);
@@ -341,7 +347,7 @@ async function triggerDownload(url, title, qualityProfile) {
     }
   } catch (err) {
     alert(
-      "No se pudo conectar con el motor local. ¿Está ejecutándose start_server.bat?",
+      `No se pudo conectar con el motor local. ¿Está ejecutándose ${SCRIPT_SERVIDOR}?`,
     );
   }
 }
